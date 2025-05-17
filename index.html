@@ -111,7 +111,7 @@ body {
 
 		<script src="index.js"></script>
 		<script>
-const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"ensureCrossOriginIsolationHeaders":true,"executable":"index","experimentalVK":false,"fileSizes":{"index.pck":102381088,"index.wasm":52126319},"focusCanvas":true,"gdextensionLibs":[]};
+const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"ensureCrossOriginIsolationHeaders":true,"executable":"index","experimentalVK":true,"fileSizes":{"index.pck":102380928,"index.wasm":52126319},"focusCanvas":true,"gdextensionLibs":[]};
 const GODOT_THREADS_ENABLED = false;
 const engine = new Engine(GODOT_CONFIG);
 
@@ -213,54 +213,6 @@ const engine = new Engine(GODOT_CONFIG);
 			setStatusMode('hidden');
 		}, displayFailureNotice);
 	}
-
-	var inputOverlay = null;
-
-	function showKeyboardInput(initialValue, callback) {
-		if (inputOverlay) {
-			document.body.removeChild(inputOverlay);
-			inputOverlay = null;
-		}
-
-		inputOverlay = document.createElement("input");
-		inputOverlay.type = "text";
-		inputOverlay.value = initialValue || "";
-		inputOverlay.style.position = "absolute";
-		inputOverlay.style.top = "30%";
-		inputOverlay.style.left = "10%";
-		inputOverlay.style.width = "80%";
-		inputOverlay.style.fontSize = "28px";
-		inputOverlay.style.zIndex = 1000;
-		inputOverlay.style.opacity = 0.8;
-		inputOverlay.style.padding = "10px";
-		inputOverlay.style.border = "2px solid black";
-		inputOverlay.style.borderRadius = "8px";
-
-		inputOverlay.addEventListener("blur", function () {
-			callback(inputOverlay.value);
-			document.body.removeChild(inputOverlay);
-			inputOverlay = null;
-		});
-
-		document.body.appendChild(inputOverlay);
-		inputOverlay.focus();
-	}
-	document.addEventListener("click", function (e) {
-		if (typeof Godot !== "undefined") {
-			var canvas = document.querySelector("canvas");
-			if (canvas) {
-				canvas.focus();
-			}
-		}
-	}, true);
-	
-	document.addEventListener('touchstart', function() {
-		const input = document.querySelector('canvas');
-		if (input) {
-		input.focus();
-		}
-	}, false);
-
 }());
 		</script>
 	</body>
