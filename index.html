@@ -1,240 +1,263 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, orientation=landscape"
-    />
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, orientation=landscape" />
+  <title>BioShield</title>
+  <style>
+    html, body, #canvas {
+      margin: 0;
+      padding: 0;
+      border: 0;
+    }
 
-    <title>BioShield</title>
+    body {
+      background-color: black;
+      color: white;
+      overflow: hidden;
+      touch-action: none;
+    }
 
-    <style>
-      html,
-      body,
-      #canvas {
-        margin: 0;
-        padding: 0;
-        border: 0;
-      }
+    #canvas {
+      display: block;
+    }
 
-      body {
-        background-color: black;
-        color: white;
-        overflow: hidden;
-        touch-action: none;
-      }
+    #canvas:focus {
+      outline: none;
+    }
 
-      #canvas {
-        display: block;
-      }
+    #fullscreen-button {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      z-index: 1000;
+    }
 
-      #canvas:focus {
-        outline: none;
-      }
+    #rotate-notice {
+      display: none;
+      position: fixed;
+      z-index: 2000;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: black;
+      color: white;
+      font-size: 2em;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
 
-      #fullscreen-button {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        z-index: 1000;
-      }
-
+    @media only screen and (orientation: portrait) {
       #rotate-notice {
-        display: none;
-        position: fixed;
-        z-index: 2000;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
-        background: black;
-        color: white;
-        font-size: 2em;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
+        display: flex;
       }
 
-      @media only screen and (orientation: portrait) {
-        #rotate-notice {
-          display: flex;
-        }
-
-        #canvas,
-        #fullscreen-button {
-          display: none;
-        }
+      #canvas,
+      #fullscreen-button,
+      #login-screen {
+        display: none !important;
       }
-    </style>
+    }
 
-    <link
-      id="-gd-engine-icon"
-      rel="icon"
-      type="image/png"
-      href="BioShield.icon.png"
-    />
-    <link rel="apple-touch-icon" href="BioShield.apple-touch-icon.png" />
-  </head>
-  <body>
-    <canvas id="canvas">Your browser does not support the canvas tag.</canvas>
+    #login-screen {
+      position: absolute;
+      z-index: 3000;
+      background: black;
+      color: white;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
 
-    <img
-      id="status-splash"
-      src="BioShield.png"
-      alt="Loading..."
-      style="
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        margin: auto;
-        max-width: 100%;
-        max-height: 100%;
-        image-rendering: pixelated;
-        object-fit: contain;
-        background: black;
-        z-index: 999;
-      "
-    />
+    #login-screen input {
+      font-size: 1.5em;
+      padding: 10px;
+      width: 60%;
+      text-align: center;
+      border-radius: 10px;
+      margin-bottom: 20px;
+    }
 
-    <button id="fullscreen-button">Fullscreen</button>
-    <div id="rotate-notice">
-      <div>
-        Please rotate your device to play the game.<br />
-        If the keyboard doesn't appear, exit fullscreen to enter your name.
-      </div>
+    #login-screen button {
+      font-size: 1.2em;
+      padding: 10px 20px;
+      border-radius: 10px;
+      background: #222;
+      color: white;
+      border: 1px solid white;
+    }
+  </style>
+
+  <link id="-gd-engine-icon" rel="icon" type="image/png" href="BioShield.icon.png" />
+  <link rel="apple-touch-icon" href="BioShield.apple-touch-icon.png" />
+</head>
+<body>
+  <div id="login-screen">
+    <input id="username-input" type="text" placeholder="Enter your name" autocomplete="off" autocorrect="off" />
+    <button id="start-button">Start Game</button>
+  </div>
+
+  <canvas id="canvas">Your browser does not support the canvas tag.</canvas>
+
+  <img id="status-splash" src="BioShield.png" alt="Loading..." style="position: absolute; top: 0; bottom: 0; left: 0; right: 0; margin: auto; max-width: 100%; max-height: 100%; image-rendering: pixelated; object-fit: contain; background: black; z-index: 999;" />
+
+  <button id="fullscreen-button" style="display: none">Fullscreen</button>
+
+  <div id="rotate-notice">
+    <div>
+      Please rotate your device to play the game.<br />
+      If the keyboard doesn't appear, exit fullscreen to enter your name.
     </div>
-    <noscript>Your browser does not support JavaScript.</noscript>
+  </div>
 
-    <script src="BioShield.js"></script>
-    <script>
-      const canvas = document.getElementById("canvas");
+  <noscript>Your browser does not support JavaScript.</noscript>
 
-      // Fullscreen button
-      document
-        .getElementById("fullscreen-button")
-        .addEventListener("click", () => {
-          if (canvas.requestFullscreen) canvas.requestFullscreen();
-          else if (canvas.webkitRequestFullscreen)
-            canvas.webkitRequestFullscreen();
-          else if (canvas.msRequestFullscreen) canvas.msRequestFullscreen();
-        });
+  <script src="BioShield.js"></script>
+  <script>
+    const canvas = document.getElementById("canvas");
+    const loginScreen = document.getElementById("login-screen");
+    const usernameInput = document.getElementById("username-input");
+    const startButton = document.getElementById("start-button");
 
-      // Auto fullscreen on mobile tap
-      canvas.addEventListener("touchend", () => {
-        if (document.fullscreenElement == null) {
-          canvas.requestFullscreen?.().catch(() => {});
-        }
-      });
+    const GODOT_CONFIG = {
+      args: [],
+      canvasResizePolicy: 2,
+      ensureCrossOriginIsolationHeaders: true,
+      executable: "BioShield",
+      experimentalVK: false,
+      fileSizes: {
+        "zzzBioShield.pck": 102736432,
+        "BioShield.wasm": 52106500,
+      },
+      focusCanvas: true,
+      gdextensionLibs: [],
+    };
+    const GODOT_THREADS_ENABLED = false;
+    const engine = new Engine(GODOT_CONFIG);
 
-      // Godot engine loader
-      const GODOT_CONFIG = {
-        args: [],
-        canvasResizePolicy: 2,
-        ensureCrossOriginIsolationHeaders: true,
-        executable: "BioShield",
-        experimentalVK: false,
-        fileSizes: {
-          "BioShield.pck": 102736432,
-          "BioShield.wasm": 52106500,
-        },
-        focusCanvas: true,
-        gdextensionLibs: [],
-      };
-      const GODOT_THREADS_ENABLED = false;
-      const engine = new Engine(GODOT_CONFIG);
+    function isIOS() {
+      return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    }
 
-      (function () {
-        const statusOverlay = document.createElement("div");
-        const statusProgress = document.createElement("progress");
-        const statusNotice = document.createElement("div");
+    function startGodotGame() {
+      const statusOverlay = document.createElement("div");
+      const statusProgress = document.createElement("progress");
+      const statusNotice = document.createElement("div");
 
-        statusOverlay.id = "status";
-        statusProgress.id = "status-progress";
-        statusNotice.id = "status-notice";
+      statusOverlay.id = "status";
+      statusProgress.id = "status-progress";
+      statusNotice.id = "status-notice";
 
-        statusOverlay.style.position = "absolute";
-        statusOverlay.style.top = "0";
-        statusOverlay.style.left = "0";
-        statusOverlay.style.right = "0";
-        statusOverlay.style.bottom = "0";
-        statusOverlay.style.display = "flex";
-        statusOverlay.style.flexDirection = "column";
-        statusOverlay.style.justifyContent = "center";
-        statusOverlay.style.alignItems = "center";
-        statusOverlay.style.pointerEvents = "none";
-        statusOverlay.style.zIndex = "1001"; // Just below splash image
+      statusOverlay.style.position = "absolute";
+      statusOverlay.style.top = "0";
+      statusOverlay.style.left = "0";
+      statusOverlay.style.right = "0";
+      statusOverlay.style.bottom = "0";
+      statusOverlay.style.display = "flex";
+      statusOverlay.style.flexDirection = "column";
+      statusOverlay.style.justifyContent = "center";
+      statusOverlay.style.alignItems = "center";
+      statusOverlay.style.pointerEvents = "none";
+      statusOverlay.style.zIndex = "1001";
 
-        statusProgress.style.position = "absolute";
-        statusProgress.style.bottom = "40px"; // adds bottom padding
-        statusProgress.style.left = "50%";
-        statusProgress.style.transform = "translateX(-50%)";
-        statusProgress.style.width = "60%";
+      statusProgress.style.position = "absolute";
+      statusProgress.style.bottom = "40px";
+      statusProgress.style.left = "50%";
+      statusProgress.style.transform = "translateX(-50%)";
+      statusProgress.style.width = "60%";
 
-        document.body.appendChild(statusOverlay);
-        statusOverlay.appendChild(statusProgress);
-        statusOverlay.appendChild(statusNotice);
+      document.body.appendChild(statusOverlay);
+      statusOverlay.appendChild(statusProgress);
+      statusOverlay.appendChild(statusNotice);
 
-        let initializing = true;
-        let statusMode = "";
+      let initializing = true;
+      let statusMode = "";
 
-        function setStatusMode(mode) {
-          if (statusMode === mode || !initializing) return;
-          if (mode === "hidden") {
-            statusOverlay.remove();
-            initializing = false;
-            return;
-          }
-          statusOverlay.style.visibility = "visible";
-          statusProgress.style.display = mode === "progress" ? "block" : "none";
-          statusNotice.style.display = mode === "notice" ? "block" : "none";
-          statusMode = mode;
-        }
-
-        function setStatusNotice(text) {
-          statusNotice.innerText = text;
-        }
-
-        function displayFailureNotice(err) {
-          console.error(err);
-          if (err instanceof Error) setStatusNotice(err.message);
-          else if (typeof err === "string") setStatusNotice(err);
-          else setStatusNotice("An unknown error occurred.");
-          setStatusMode("notice");
+      function setStatusMode(mode) {
+        if (statusMode === mode || !initializing) return;
+        if (mode === "hidden") {
+          statusOverlay.remove();
           initializing = false;
+          return;
         }
+        statusOverlay.style.visibility = "visible";
+        statusProgress.style.display = mode === "progress" ? "block" : "none";
+        statusNotice.style.display = mode === "notice" ? "block" : "none";
+        statusMode = mode;
+      }
 
-        const missing = Engine.getMissingFeatures({
-          threads: GODOT_THREADS_ENABLED,
-        });
+      function setStatusNotice(text) {
+        statusNotice.innerText = text;
+      }
 
-        if (missing.length !== 0) {
-          const missingMsg =
-            "Error\nMissing required features:\n" + missing.join("\n");
-          displayFailureNotice(missingMsg);
+      function displayFailureNotice(err) {
+        console.error(err);
+        if (err instanceof Error) setStatusNotice(err.message);
+        else if (typeof err === "string") setStatusNotice(err);
+        else setStatusNotice("An unknown error occurred.");
+        setStatusMode("notice");
+        initializing = false;
+      }
+
+      const missing = Engine.getMissingFeatures({ threads: GODOT_THREADS_ENABLED });
+
+      if (missing.length !== 0) {
+        const missingMsg = "Error\nMissing required features:\n" + missing.join("\n");
+        displayFailureNotice(missingMsg);
+      } else {
+        setStatusMode("progress");
+        engine.startGame({
+          onProgress(current, total) {
+            if (current > 0 && total > 0) {
+              statusProgress.value = current;
+              statusProgress.max = total;
+            } else {
+              statusProgress.removeAttribute("value");
+              statusProgress.removeAttribute("max");
+            }
+          },
+        }).then(() => {
+          document.getElementById("status-splash").style.display = "none";
+          setStatusMode("hidden");
+        }, displayFailureNotice);
+      }
+    }
+
+    startButton.addEventListener("click", () => {
+      const username = usernameInput.value.trim();
+      if (username) {
+        localStorage.setItem("username", username);
+        loginScreen.style.display = "none";
+
+        if (isIOS()) {
+          // iOS fallback fullscreen emulation
+          canvas.style.position = "fixed";
+          canvas.style.top = "0";
+          canvas.style.left = "0";
+          canvas.style.width = "100vw";
+          canvas.style.height = "100vh";
+          canvas.style.zIndex = "2000";
+          canvas.style.background = "black";
+          document.body.style.overflow = "hidden";
+          startGodotGame();
         } else {
-          setStatusMode("progress");
-          engine
-            .startGame({
-              onProgress(current, total) {
-                if (current > 0 && total > 0) {
-                  statusProgress.value = current;
-                  statusProgress.max = total;
-                } else {
-                  statusProgress.removeAttribute("value");
-                  statusProgress.removeAttribute("max");
-                }
-              },
-            })
-            .then(() => {
-              document.getElementById("status-splash").style.display = "none";
-              setStatusMode("hidden");
-            }, displayFailureNotice);
+          // Attempt real fullscreen on Android/Desktop
+          if (canvas.requestFullscreen) {
+            canvas.requestFullscreen().finally(() => startGodotGame());
+          } else {
+            startGodotGame();
+          }
         }
-      })();
-    </script>
-  </body>
+      } else {
+        alert("Please enter your name to continue.");
+      }
+    });
+  </script>
+</body>
 </html>
 
